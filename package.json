@@ -9,7 +9,9 @@
   "description": "",
   "dependencies": {
     "async": "^1.5.0",
+    "body-parser": "^1.15.0",
     "cheerio": "^0.19.0",
+    "express": "^4.13.4",
     "request": "^2.65.0"
   }
 }
