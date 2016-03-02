@@ -5,6 +5,8 @@ var cheerio = require('cheerio');
 var app = express();
 var async = require('async')
 var bodyParser = require('body-parser');
+var questData = require('./data.js')
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: true
@@ -13,7 +15,6 @@ app.use(bodyParser.urlencoded({
 //ROUTES ===============================================
 
 app.post('/scrape', function(req, res) {
-    console.log(req.body.username)
     url = 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws';
     request({
         method: 'POST',
@@ -69,7 +70,36 @@ app.post('/scrape', function(req, res) {
                     }
                 }
             })
-            res.send(list)
+			list.pop()
+            var quests = []
+            for (var i in questData) {
+                var quest = questData[i]
+                if (quest.requirements.length == 0) {
+                    quests.push(quest.name)
+                    continue
+                }
+                for (var j in quest.requirements) {
+                    var skill = quest.requirements[j].skill
+                    var level = quest.requirements[j].level
+                    var breakOut = false
+                    for (var k in list) {
+                        var playerSkill = list[k]
+                        if (playerSkill.name == skill) {
+                            if (playerSkill.level < level) {
+                                breakOut = true
+                                break
+                            }
+                        }
+                    }
+                    if (breakOut) {
+                        break
+                    }
+                }
+				if (!breakOut){
+					quests.push(quest.name)
+				}
+            }
+            res.send(quests)
         } else {
             console.log('there was an error')
         }
