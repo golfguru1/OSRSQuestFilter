@@ -8,12 +8,14 @@ var bodyParser = require('body-parser');
 var questData = require('./data.js')
 
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
-app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.static(__dirname + '/public'))
 
 //ROUTES ===============================================
+
+app.get('/', function(req, res){
+	res.sendfile('./public/index.html')
+})
 
 app.post('/scrape', function(req, res) {
     url = 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws';
