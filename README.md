@@ -4,7 +4,7 @@ A filter for Oldschool Runescape quests that shows you what quests you can do ba
 
 *Disclaimer: It shows the quests for which you meet the HARD requirements to complete, RECOMMENDED requirements are not taken into account. Also shows P2P quests, F2P filter to be added later.*
 
-live at [osrsquestfilter.herokuapp.com](osrsquestfilter.herokuapp.com)
+live at [osrsquestfilter.herokuapp.com](http://osrsquestfilter.herokuapp.com)
 
 ####Web interface TBD
 
