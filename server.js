@@ -1,9 +1,7 @@
 var express = require('express');
-var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app = express();
-var async = require('async')
 var bodyParser = require('body-parser');
 var questData = require('./data.js')
 
@@ -14,7 +12,7 @@ app.use(express.static(__dirname + '/public'))
 //ROUTES ===============================================
 
 app.get('/', function(req, res){
-	res.sendfile('./public/index.html')
+	res.sendFile('./public/index.html')
 })
 
 app.post('/scrape', function(req, res) {
