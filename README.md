@@ -2,7 +2,7 @@
 
 A filter for Oldschool Runescape quests that shows you what quests you can do based on your skill levels.
 
-*Disclaimer: It shows the quests for which you meet the HARD requirements to complete, RECOMMENDED requirements are not taken into account*
+*Disclaimer: It shows the quests for which you meet the HARD requirements to complete, RECOMMENDED requirements are not taken into account. Also shows P2P quests, F2P filter to be added later.*
 
 ####Web interface TBD
 
