@@ -1,6 +1,7 @@
 $(document).ready(function() {
+    $(".progress").hide()
     $('[name="submitButton"]').click(function() {
-
+        $(".progress").show()
         $("#requirementsTable").find("tr:gt(0)").remove();
 
         var usernameText = $('[name="username"]').val()
@@ -16,6 +17,7 @@ $(document).ready(function() {
                     }
                     $("#requirementsTable > tbody").append("<tr><td>" + response[i].name + "</td><td>" + requirementsString + "</td></tr>")
                 }
+                $(".progress").hide()
             }).fail(function() {
                 console.error("error");
             })
