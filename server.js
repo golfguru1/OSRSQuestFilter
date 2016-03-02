@@ -4,10 +4,13 @@ var cheerio = require('cheerio');
 var app = express();
 var bodyParser = require('body-parser');
 var questData = require('./data.js')
+var port = process.env.PORT || 3000
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static(__dirname + '/public'))
+
+
 
 //ROUTES ===============================================
 
@@ -107,8 +110,8 @@ app.post('/scrape', function(req, res) {
     })
 })
 
-app.listen('1330')
+app.listen(port)
 
-console.log('Magic happens on port 1330');
+console.log('Magic happens on port '+port);
 
 exports = module.exports = app;
