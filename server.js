@@ -5,11 +5,12 @@ var app = express();
 var bodyParser = require('body-parser');
 var questData = require('./data.js')
 var port = process.env.PORT || 3000
+var compression		= require('compression')
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.static(__dirname + '/public'))
-
+app.use(compression())
 
 
 //ROUTES ===============================================
@@ -19,6 +20,7 @@ app.get('/', function(req, res){
 })
 
 app.post('/scrape', function(req, res) {
+	console.log("here")
     url = 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws';
     request({
         method: 'POST',
@@ -39,6 +41,7 @@ app.post('/scrape', function(req, res) {
             }
         }
     }, function(error, response, html) {
+		console.log("in response")
         if (!error) {
             var $ = cheerio.load(html);
             var list = []
@@ -79,7 +82,7 @@ app.post('/scrape', function(req, res) {
             for (var i in questData) {
                 var quest = questData[i]
                 if (quest.requirements.length == 0) {
-                    quests.push(quest.name)
+                    quests.push(quest)
                     continue
                 }
                 for (var j in quest.requirements) {
@@ -100,9 +103,10 @@ app.post('/scrape', function(req, res) {
                     }
                 }
 				if (!breakOut){
-					quests.push(quest.name)
+					quests.push(quest)
 				}
             }
+			console.log("done")
             res.send(quests)
         } else {
             console.log('there was an error')
