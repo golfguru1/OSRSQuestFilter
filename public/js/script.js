@@ -6,20 +6,41 @@ $(document).ready(function() {
 
         var usernameText = $('[name="username"]').val()
 
-        $.post("/scrape", {
-                username: usernameText
-            })
-            .done(function(response) {
-                for (var i in response) {
-                    var requirementsString = ""
-                    for (var j in response[i].requirements) {
-                        requirementsString += response[i].requirements[j].skill + " : " + response[i].requirements[j].level + " "
+        $.post("/user", {
+            username: usernameText
+        }).done(function(user) {
+            $.post("/scrape", {
+                    username: usernameText,
+                    completedQuests: user.quests
+                })
+                .done(function(response) {
+                    for (var i in response) {
+                        var requirementsString = ""
+                        var quest = response[i]
+                        for (var j in quest.requirements) {
+                            var requirement = quest.requirements[j]
+                            requirementsString += requirement.skill + " : " + requirement.level + " "
+                        }
+                        $("#requirementsTable > tbody").append("<tr id="+ quest._id +"><td>" + quest.name + "</td><td>" + requirementsString + "</td><td><a class=\"waves-effect waves-light btn\" id=\"doneQuestButton-" + quest._id + "\"><i class=\"material-icons\">thumb_up</i></a></td></tr>")
+                        $('#doneQuestButton-' + quest._id).click({
+                            id: quest._id
+                        }, function(event) {
+                            $("#"+event.data.id).remove()
+                            $.post("/saveQuest", {
+                                username: usernameText,
+                                _id: event.data.id
+                            }).done(function(response) {
+                            })
+
+                        })
                     }
-                    $("#requirementsTable > tbody").append("<tr><td>" + response[i].name + "</td><td>" + requirementsString + "</td></tr>")
-                }
-                $(".progress").hide()
-            }).fail(function() {
-                console.error("error");
-            })
+                    $(".progress").hide()
+                }).fail(function() {
+                    console.error("error");
+                })
+        }).fail(function(){
+            console.log("user error");
+        })
+
     })
 });
