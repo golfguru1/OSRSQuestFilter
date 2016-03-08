@@ -21,7 +21,7 @@ $(document).ready(function() {
                             var requirement = quest.requirements[j]
                             requirementsString += requirement.skill + " : " + requirement.level + " "
                         }
-                        $("#requirementsTable > tbody").append("<tr id="+ quest._id +"><td>" + quest.name + "</td><td>" + requirementsString + "</td><td><a class=\"waves-effect waves-light btn\" id=\"doneQuestButton-" + quest._id + "\"><i class=\"material-icons\">thumb_up</i></a></td></tr>")
+                        $("#requirementsTable > tbody").append("<tr id="+ quest._id +"><td>" + quest.name + "</td><td>" + requirementsString + "</td><td><a class=\"waves-effect waves-light btn blue-grey\" id=\"doneQuestButton-" + quest._id + "\"><i class=\"material-icons\">thumb_up</i></a></td></tr>")
                         $('#doneQuestButton-' + quest._id).click({
                             id: quest._id
                         }, function(event) {
