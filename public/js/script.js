@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $(".progress").hide()
     $('[name="submitButton"]').click(function() {
+        $('[name="submitButton"]').prop('disabled', true);
         $(".progress").show()
         $("#requirementsTable").find("tr:gt(0)").remove();
 
@@ -14,6 +15,7 @@ $(document).ready(function() {
                     completedQuests: user.quests
                 })
                 .done(function(response) {
+                    $('[name="submitButton"]').prop('disabled', false);
                     for (var i in response) {
                         var requirementsString = ""
                         var quest = response[i]
