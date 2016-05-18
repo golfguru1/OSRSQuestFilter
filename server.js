@@ -90,7 +90,7 @@ app.post('/user', function(req, res) {
     })
 })
 
-var skillNames = ["Total Level", "Attack", "Defence", "Strength", "Constitution", "Ranged", "Prayer", "Magic", "Cooking", "Woodcutting", "Fletching", "Fishing", "Firemaking", "Crafting", "Smithing", "Mining", "Herblore", "Agility", "Thieving", "Slayer", "Farming", "Runecrafting", "Hunter", "Construction", "Summoning", "Dungeoneering", "Divination"]
+var skillNames = ["Total Level", "Attack", "Defence", "Strength", "Constitution", "Ranged", "Prayer", "Magic", "Cooking", "Woodcutting", "Fletching", "Fishing", "Firemaking", "Crafting", "Smithing", "Mining", "Herblore", "Agility", "Theiving", "Slayer", "Farming", "Runecraft", "Hunter", "Construction", "Summoning", "Dungeoneering", "Divination"]
 
 app.post('/scrape', function(req, res) {
     var username = req.body.username.trim()
