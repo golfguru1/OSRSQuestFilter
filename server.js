@@ -5,6 +5,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var port = process.env.PORT || 3000
 var compression = require('compression')
+var csv = require("fast-csv");
 db = require('mongoose');
 
 
@@ -43,19 +44,19 @@ app.post('/saveQuest', function(req, res) {
             res.send(err)
         }
         if (quest) {
-			console.log(quest)
+            console.log(quest)
             User.findOne({
                 username: username
             }, function(err, user) {
-                if (err){
+                if (err) {
                     res.send(err)
-				}
+                }
                 if (user) {
-					user.quests.push(quest)
-					user.save()
+                    user.quests.push(quest)
+                    user.save()
                 } else {
-					res.sendStatus(500)
-				}
+                    res.sendStatus(500)
+                }
             })
         }
     })
@@ -63,139 +64,88 @@ app.post('/saveQuest', function(req, res) {
 
 app.post('/user', function(req, res) {
 
-	var username = req.body.username.trim()
+    var username = req.body.username.trim()
 
-	User.findOne({
-		username: username
-	}, function(err, user) {
-		if (err)
-			res.send(err)
-		if (user) {
-			console.log("user exists")
-			res.send(user)
-		} else {
-			var newUser = new User({
-				username: username,
-				quests: []
-			})
-			newUser.save(function(err, user) {
-				if (err)
-					res.send(err)
-				else {
-					res.send(user)
-				}
-			})
-		}
-	})
-})
-
-app.post('/scrape', function(req, res) {
-
-	var username = req.body.username.trim()
-
-    console.log("here")
-    url = 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws';
-    request({
-        method: 'POST',
-        uri: 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws',
-        har: {
-            url: 'http://services.runescape.com/m=hiscore_oldschool/hiscorepersonal.ws',
-            method: 'POST',
-            headers: [{
-                name: 'content-type',
-                value: 'application/x-www-form-urlencoded'
-            }],
-            postData: {
-                mimeType: 'application/x-www-form-urlencoded',
-                params: [{
-                    name: 'user1',
-                    value: username
-                }]
-            }
-        }
-    }, function(error, response, html) {
-        if (html.indexOf("No player") > -1) {
-            res.send("nope")
-        }
-        console.log("in response")
-        if (!error) {
-            var $ = cheerio.load(html);
-            var list = []
-            $('td[align="left"]').filter(function() {
-                var data = $(this);
-                var el = data.text().split('\n')
-                var trigger = false
-                if (el.length != 3) {
-
-                    for (var i = 0; i < el.length; i++) {
-                        var item = {
-                            name: '',
-                            rank: '',
-                            level: '',
-                            xp: ''
-                        }
-                        if (el[i] == "Attack")
-                            trigger = true
-                        if (trigger) {
-                            while (1) {
-                                var item = {
-                                    name: el[i],
-                                    rank: el[i + 2],
-                                    level: el[i + 3],
-                                    xp: el[i + 4],
-                                }
-                                list.push(item)
-                                i = i + 9
-                                if (i >= el.length - 1)
-                                    break;
-                            }
-                        }
-                    }
+    User.findOne({
+        username: username
+    }, function(err, user) {
+        if (err)
+            res.send(err)
+        if (user) {
+            console.log("user exists")
+            res.send(user)
+        } else {
+            var newUser = new User({
+                username: username,
+                quests: []
+            })
+            newUser.save(function(err, user) {
+                if (err)
+                    res.send(err)
+                else {
+                    res.send(user)
                 }
             })
-            list.pop()
-            var quests = []
-            Quest.find({_id:{$nin:req.body.completedQuests}},function(err, questData) {
-                if (err) {
-                    console.log(err)
-                    res.send(quests)
-                } else {
-                    for (var i in questData) {
-                        var quest = questData[i]
-                        if (quest.requirements.length == 0) {
-                            quests.push(quest)
-                            continue
+        }
+    })
+})
+
+var skillNames = ["Total Level", "Attack", "Defence", "Strength", "Constitution", "Ranged", "Prayer", "Magic", "Cooking", "Woodcutting", "Fletching", "Fishing", "Firemaking", "Crafting", "Smithing", "Mining", "Herblore", "Agility", "Thieving", "Slayer", "Farming", "Runecrafting", "Hunter", "Construction", "Summoning", "Dungeoneering", "Divination"]
+
+app.post('/scrape', function(req, res) {
+    var username = req.body.username.trim()
+    var url = 'http://services.runescape.com/m=hiscore_oldschool/index_lite.ws?player=' + username
+    request(url, function(error, response, body) {
+        console.log(response.statusCode);
+        var stats = {}
+        var counter = 0
+        if (!error && response.statusCode == 200) {
+            csv.fromString(body, {
+                    headers: false
+                })
+                .on("data", function(data) {
+                    stats[skillNames[counter]] = parseInt(data[1])
+                    counter++
+                })
+                .on("end", function() {
+                    var quests = []
+                    Quest.find({
+                        _id: {
+                            $nin: req.body.completedQuests
                         }
-                        for (var j in quest.requirements) {
-                            var skill = quest.requirements[j].skill
-                            var level = quest.requirements[j].level
-                            var breakOut = false
-                            for (var k in list) {
-                                var playerSkill = list[k]
-                                if (playerSkill.name == skill) {
-                                    if (playerSkill.level < level) {
+                    }, function(err, questData) {
+                        if (err) {
+                            console.log(err)
+                            res.send(quests)
+                        } else {
+                            for (var i in questData) {
+                                var quest = questData[i]
+                                if (quest.requirements.length == 0) {
+                                    quests.push(quest)
+                                    continue
+                                }
+                                var breakOut = false
+                                for (var j in quest.requirements) {
+                                    var skill = quest.requirements[j].skill
+                                    var level = quest.requirements[j].level
+                                    if (stats[skill] < level) {
                                         breakOut = true
                                         break
                                     }
                                 }
+                                if (!breakOut) {
+                                    quests.push(quest)
+                                }
                             }
-                            if (breakOut) {
-                                break
-                            }
+                            console.log("done")
+                            res.send(quests)
                         }
-                        if (!breakOut) {
-                            quests.push(quest)
-                        }
-                    }
-                    console.log("done")
-                    res.send(quests)
-                }
-            })
-        } else {
-            console.log('there was an error')
+                    })
+                })
         }
     })
-})
+});
+
 
 app.listen(port)
 
